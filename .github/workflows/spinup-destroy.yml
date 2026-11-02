@@ -27,24 +27,11 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Diagnose and Create Resource Group
-        env:
-          raw_sub_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: Create Azure resource group
+        if: success()
         run: |
-          # 1. 自动清除 Secret 中可能隐藏的空格、回车符 (\r) 和换行符 (\n)
-          CLEAN_SUB_ID=$(echo "$raw_sub_id" | tr -d '[:space:]')
-          echo "Subscription ID 字符长度为: ${#CLEAN_SUB_ID} (标准 UUID 应为 36)"
-      
-          # 2. 查看当前登录的身份、所属租户 (Tenant) 以及当前连接的云环境
-          echo "=== 当前登录账户信息 ==="
-          az account show || true
-          
-          echo "=== 当前可见的所有订阅列表 ==="
-          az account list --all --output table
-       
-          # 3. 显式切换上下文并创建资源组
-          az account set --subscription "$CLEAN_SUB_ID"
-          az group create --location "East US" --name cd-with-actions
+          az group create --location ${{env.AZURE_LOCATION}} --name ${{env.AZURE_RESOURCE_GROUP}} --subscription ${{secrets.AZURE_SUBSCRIPTION_ID}}
+
       - name: Create Azure app service plan
         if: success()
         run: |
