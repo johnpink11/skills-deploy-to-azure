@@ -41,7 +41,7 @@ jobs:
           
           echo "=== 当前可见的所有订阅列表 ==="
           az account list --all --output table
-      
+       
           # 3. 显式切换上下文并创建资源组
           az account set --subscription "$CLEAN_SUB_ID"
           az group create --location "East US" --name cd-with-actions
